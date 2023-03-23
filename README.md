@@ -11,12 +11,14 @@ This is a simple Pong game created using C++ and the SFML (Simple and Fast Multi
 1. Install the SFML Library according to your operating system. You can find detailed instructions on the SFML website: https://www.sfml-dev.org/download.php
 2. Download or clone this repository to your computer.
 3. Open a terminal/command prompt and navigate to the directory where the repository is located.
-4. Compile the program using your C++ IDE. 
-5. Run the program in your IDE.
-6. Play the game using the up or down arrow keys or the W and S keys to move up and down. The Enter key starts the game and the X key exits the game.
+4. Copy the included CMake.txt into your CMake file and change the directory location to your specific directory and ensure the file names match
+5. Compile the program using your C++ IDE. 
+6. Run the program in your IDE.
+7. Play the game using the up or down arrow keys or the W and S keys to move up and down. The Enter key starts the game and the X key exits the game.
 
 ## Files
 * main.cpp
 * Keyboard.hpp
 * Graphics.hpp
 * pong_defs.h
+* CMakeLists.txt
