@@ -15,5 +15,5 @@ find_package(SFML 2.5.1 COMPONENTS system window graphics
         network audio)
 
 
-add_executable(PongFinalExtraCredit main.cpp pong_defs.h pong_defs.h pong_defs.h)
+add_executable(PongFinalExtraCredit main.cpp pong_defs.h pong_defs.h pong_defs.h functions.h)
 target_link_libraries(PongFinalExtraCredit sfml-graphics sfml-window sfml-system)
