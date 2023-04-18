@@ -1,5 +1,5 @@
 /* --------------------------------------------------------
- *    File: main.cpp
+ *    File: functions.h
  *  Author: Luke Hepokoski
  *   Class: COP 2006 Spring 2022 CRN 13969
  * Purpose: adding function definitions
@@ -8,7 +8,7 @@
 #define PONGFINAL_FUNCTIONS_H
 
 #include <SFML/Graphics.hpp>
-
+#include "pong_defs.h"
 /**
  * setup for game objects
  * @param ball - ball parameter
@@ -16,7 +16,7 @@
  * @param paddle - user paddle parameter
  * @param paddle2 - computer paddle parameter
  */
-void setup(Ball &ball, Borders &wall, MoveBlock &paddle, MoveBlock &paddle2) {
+void setup(Borders &wall, MoveBlock &paddle, MoveBlock &paddle2) {
 
     // define left wall
     wall.leftWall.left = 0.0;
@@ -76,13 +76,6 @@ void setup(Ball &ball, Borders &wall, MoveBlock &paddle, MoveBlock &paddle2) {
     paddle2.velocityY = 0.0;
     paddle2.velocityX = 0.0;
 
-    // declare a ball variable and populate it in the center of the window
-    ball.radius = BALL_RADIUS;
-    ball.coordinateX = paddle.location.left + paddle.location.width + BALL_RADIUS + 1;
-    ball.coordinateY = paddle.location.top + (paddle.location.height / 2.0);
-    ball.velocityX = 0.0;
-    ball.velocityY = 0.0;
-    ball.color = BALL_COLOR;
 
 } // end setup
 
@@ -126,15 +119,15 @@ Direction processInput() {
  * @param wall - rectangle that is used to determine whether collision is made
  * @return collide - returns a true value if the ball collides with a wall
  */
-bool ballCollision(Ball ball, Block wall) {
+bool ballCollision(std::shared_ptr<BallClass> ball, BlockClass wall) {
 
     bool collide = false;
 
     // declare variables for ball
-    float leftBall = ball.coordinateX - ball.radius;
-    float topBall = ball.coordinateY - ball.radius;
-    float rightBall = ball.coordinateX + ball.radius;
-    float bottomBall = ball.coordinateY + ball.radius;
+    float leftBall = ball->coordinateX - ball->radius;
+    float topBall = ball->coordinateY - ball->radius;
+    float rightBall = ball->coordinateX + ball->radius;
+    float bottomBall = ball->coordinateY + ball->radius;
 
     // declare Block variables
     float rightWall = wall.left + wall.width;
@@ -160,7 +153,7 @@ bool ballCollision(Ball ball, Block wall) {
  * @param wall - walls
  * @return collide - returns true or false if collsiion detected
  */
-bool blockCollision(MoveBlock paddle, Block wall) {
+bool blockCollision(MoveBlock paddle, BlockClass wall) {
     bool collide = false;
 
     // declare variables for paddle dimensions
@@ -196,45 +189,45 @@ bool blockCollision(MoveBlock paddle, Block wall) {
  * @param paddle2 - computer paddle
  * @return gameOver - returns true/false for collision detection
  */
-bool collisionDetect(Ball &ball, MoveBlock &paddle, Borders &walls, MoveBlock &paddle2) {
+bool collisionDetect(std::shared_ptr<BallClass> ball, MoveBlock &paddle, Borders &walls, MoveBlock &paddle2) {
     // declare local gameOver variable
     bool gameOver = false;
 
     // call ballCollision to check collision of ball and paddle
     if (ballCollision(ball, paddle.location)) {
-        if (ball.velocityY < 0 && paddle.velocityY < 0) {
-            ball.velocityY += 0.05;
-        } else if (ball.velocityY > 0 && paddle.velocityY > 0) {
-            ball.velocityY += 0.05;
+        if (ball->velocityY < 0 && paddle.velocityY < 0) {
+            ball->velocityY += 0.05;
+        } else if (ball->velocityY > 0 && paddle.velocityY > 0) {
+            ball->velocityY += 0.05;
         }
-        if (ball.velocityY > 0 && paddle.velocityY < 0) {
-            ball.velocityY -= 0.05;
-        } else if (ball.velocityY < 0 && paddle.velocityY > 0) {
-            ball.velocityY -= 0.05;
+        if (ball->velocityY > 0 && paddle.velocityY < 0) {
+            ball->velocityY -= 0.05;
+        } else if (ball->velocityY < 0 && paddle.velocityY > 0) {
+            ball->velocityY -= 0.05;
         }
-        ball.velocityX *= -1;
-        ball.coordinateX = paddle.location.left + paddle.location.width + ball.radius + 1;
+        ball->velocityX *= -1;
+        ball->coordinateX = paddle.location.left + paddle.location.width + ball->radius + 1;
     }
 
         // call ballCollision to check horizontal collisions of ball and wall
     else if (ballCollision(ball, walls.leftWall)) {
-        ball.velocityX *= -1;
-        ball.coordinateX = walls.leftWall.left + walls.leftWall.width + ball.radius + 1;
+        ball->velocityX *= -1;
+        ball->coordinateX = walls.leftWall.left + walls.leftWall.width + ball->radius + 1;
         gameOver = true;
     } else if (ballCollision(ball, walls.rightWall)) {
-        ball.velocityX *= -1;
-        ball.coordinateX = walls.rightWall.left - ball.radius - 1;
+        ball->velocityX *= -1;
+        ball->coordinateX = walls.rightWall.left - ball->radius - 1;
         gameOver = true;
     }
 
     // call ballCollision to check vertical collisions
     if (ballCollision(ball, walls.topWall)) {
-        ball.velocityY *= -1;
-        ball.coordinateY = walls.topWall.top + walls.topWall.height + ball.radius + 1;
+        ball->velocityY *= -1;
+        ball->coordinateY = walls.topWall.top + walls.topWall.height + ball->radius + 1;
 
     } else if (ballCollision(ball, walls.bottomWall)) {
-        ball.velocityY *= -1;
-        ball.coordinateY = walls.bottomWall.top - ball.radius - 1;
+        ball->velocityY *= -1;
+        ball->coordinateY = walls.bottomWall.top - ball->radius - 1;
     }
 
     // block collision to check collision between paddle and top/bottom wall
@@ -248,18 +241,18 @@ bool collisionDetect(Ball &ball, MoveBlock &paddle, Borders &walls, MoveBlock &p
 
     // collision check between ball and AI paddle
     if (ballCollision(ball, paddle2.location)) {
-        if (ball.velocityY < 0 && paddle2.velocityY < 0) {
-            ball.velocityY += 0.05;
-        } else if (ball.velocityY > 0 && paddle2.velocityY > 0) {
-            ball.velocityY += 0.05;
-        } else if (ball.velocityY > 0 && paddle2.velocityY < 0) {
-            ball.velocityY -= 0.05;
-        } else if (ball.velocityY < 0 && paddle2.velocityY > 0) {
-            ball.velocityY -= 0.05;
+        if (ball->velocityY < 0 && paddle2.velocityY < 0) {
+            ball->velocityY += 0.05;
+        } else if (ball->velocityY > 0 && paddle2.velocityY > 0) {
+            ball->velocityY += 0.05;
+        } else if (ball->velocityY > 0 && paddle2.velocityY < 0) {
+            ball->velocityY -= 0.05;
+        } else if (ball->velocityY < 0 && paddle2.velocityY > 0) {
+            ball->velocityY -= 0.05;
         }
 
-        ball.velocityX *= -1;
-        ball.coordinateX = paddle2.location.left - ball.radius - 1;
+        ball->velocityX *= -1;
+        ball->coordinateX = paddle2.location.left - ball->radius - 1;
 
     }
     // block collision to check collision between AI paddle and top/bottom wall
@@ -287,7 +280,10 @@ bool collisionDetect(Ball &ball, MoveBlock &paddle, Borders &walls, MoveBlock &p
  * @return gameOver - returns true if ball hits left wall
  */
 bool
-update(Direction &input, Ball &ball, Borders walls, MoveBlock &paddle, float delta, bool &started, MoveBlock &paddle2) {
+update(Direction &input, std::shared_ptr<BallClass> ball, Borders walls, MoveBlock &paddle, float delta, bool &started, MoveBlock &paddle2) {
+
+    paddle.location.color = PADDLE_COLOR;
+    paddle2.location.color = PADDLE_COLOR;
 
     bool gameOver = false;
     // adjust velocity directions for user input
@@ -295,13 +291,13 @@ update(Direction &input, Ball &ball, Borders walls, MoveBlock &paddle, float del
         switch (input) {
             case Start:
                 if (!started) {
-                    ball.velocityX = BALL_SPEED_X;
-                    ball.velocityY = BALL_SPEED_Y;
+                    ball->velocityX = BALL_SPEED_X;
+                    ball->velocityY = BALL_SPEED_Y;
                     /* randomly set vertical velocity to positive or negative
                      * by seeing if tenths place of current delta is
                      * odd or even */
                     if ((int(delta * 10) & 1) % 2) {
-                        ball.velocityY *= -1;
+                        ball->velocityY *= -1;
                     }
                     started = true;
                 }
@@ -330,19 +326,19 @@ update(Direction &input, Ball &ball, Borders walls, MoveBlock &paddle, float del
 
     // adjust the location of the ball for speed * time if game started
     if (started) {
-        ball.coordinateX += ball.velocityX * delta;
-        ball.coordinateY += ball.velocityY * delta;
+        ball->coordinateX += ball->velocityX * delta;
+        ball->coordinateY += ball->velocityY * delta;
         //adjust the location of the AI paddle according to ball location
-        if (ball.coordinateY < (paddle2.location.top + paddle2.location.height / 2.0)) {
+        if (ball->coordinateY < (paddle2.location.top + paddle2.location.height / 2.0)) {
             paddle2.velocityY -= PADDLE_SPEED;
-        } else if (ball.coordinateY > (paddle2.location.top + paddle2.location.height / 2.0)) {
+        } else if (ball->coordinateY > (paddle2.location.top + paddle2.location.height / 2.0)) {
             paddle2.velocityY += PADDLE_SPEED;
         }
     }
         // adjusts location of ball to paddle location if not started
     else {
-        ball.coordinateX = paddle.location.left + paddle.location.width + BALL_RADIUS + 1;
-        ball.coordinateY = paddle.location.top + (paddle.location.height / 2.0);
+        ball->coordinateX = paddle.location.left + paddle.location.width + BALL_RADIUS + 1;
+        ball->coordinateY = paddle.location.top + (paddle.location.height / 2.0);
     }
     gameOver = collisionDetect(ball, paddle, walls, paddle2);
     return gameOver;
@@ -358,7 +354,7 @@ update(Direction &input, Ball &ball, Borders walls, MoveBlock &paddle, float del
  * @param paddle - user paddle
  * @param paddle2 - comptuer paddle
  */
-void render(sf::RenderWindow &window, Ball ball, float delta, Borders border, MoveBlock paddle, MoveBlock paddle2) {
+void render(sf::RenderWindow &window, std::shared_ptr<BallClass> ball, float delta, Borders border, MoveBlock paddle, MoveBlock paddle2) {
     // Render drawing objects
     // ------------------------------------------------
     // clear the window with the background color
@@ -367,13 +363,13 @@ void render(sf::RenderWindow &window, Ball ball, float delta, Borders border, Mo
     // draw the ball
     // ------------------------------------------------
     sf::CircleShape circle;
-    circle.setFillColor(ball.color);
-    circle.setRadius(ball.radius);
+    circle.setFillColor(ball->color);
+    circle.setRadius(ball->radius);
     // set screen coordinates relative to the center of the circle
-    circle.setOrigin(ball.radius, ball.radius);
+    circle.setOrigin(ball->radius, ball->radius);
     // calculate current drawing location relative to speed and frame-time
-    float xPosition = ball.coordinateX + ball.velocityX * delta;
-    float yPosition = ball.coordinateY + ball.velocityY * delta;
+    float xPosition = ball->coordinateX + ball->velocityX * delta;
+    float yPosition = ball->coordinateY + ball->velocityY * delta;
     circle.setPosition(xPosition, yPosition);
     window.draw(circle);
 

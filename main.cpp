@@ -1,42 +1,26 @@
-/* --------------------------------------------------------
- *    File: main.cpp
- *  Author: Luke Hepokoski
- *   Class: COP 2006 Spring 2022 CRN 13969
- * Purpose: finishing pong game
- * -------------------------------------------------------- */
 #include <SFML/Graphics.hpp>
 #include "pong_defs.h"
 #include "functions.h"
 
-
-/**
- * The main application
- * @return OS stats message (0=Success)
- */
 int main() {
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Pong");
+    window.setFramerateLimit(60);  // Limit the frame rate to 60 FPS
 
-    // create a 2d graphics window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Hello SFML");
-    window.clear(WINDOW_COLOR);
-
-    // declare a MoveBlock variable for user and computer paddles
     MoveBlock playerPaddle;
     MoveBlock computerPaddle;
-
-    // declare a Ball and Border variable for ball and walls
-    Ball theBall;
     Borders theWalls;
-    setup(theBall, theWalls, playerPaddle, computerPaddle);
-
-
-    // timing variables for the main game loop
-    sf::Clock clock;
-    sf::Time startTime = clock.getElapsedTime();
-    sf::Time stopTime = startTime;
-    float delta = 0.0;
+    setup(theWalls, playerPaddle, computerPaddle);
+    // Create a shared pointer to a ball object
+    auto ball = std::make_shared<BallClass>();
+    // Set up the ball object
+    ball->setup(ball);
 
     bool started = false;
     bool gameOver = false;
+    sf::Clock clock;
+    sf::Time startTime, stopTime;
+    float delta = 0;
+
     while (!gameOver) {
         // calculate frame time
         stopTime = clock.getElapsedTime();
@@ -62,7 +46,7 @@ int main() {
         if (delta >= FRAME_RATE) {    // if we have made it at least a full frame time
 
             // ends game if update returns true
-            gameOver = update(userInput, theBall, theWalls, playerPaddle, delta, started, computerPaddle);
+            gameOver = update(userInput, ball, theWalls, playerPaddle, delta, started, computerPaddle);
 
             // subtract the frame-rate from the current frame-time
             // for each full frame covered by this update
@@ -72,13 +56,12 @@ int main() {
 
         // Render the window
         // ------------------------------------------------
-        render(window, theBall, delta, theWalls, playerPaddle, computerPaddle);
+        render(window, ball, delta, theWalls, playerPaddle, computerPaddle);
 
     } // end main game loop
 
     // game ending, close the graphics window
     window.close();
 
-    return 0;   // return success to the OS
-} // end main
-
+    return 0;
+}
